@@ -7,111 +7,68 @@
 
 import SwiftUI
 
-/*
-class User: ObservableObject {
-    @Published var firstName = "Bilbo"
-    @Published var lastName = "Baggins"
+struct ExpenseItem: Identifiable, Codable {
+    var id = UUID()
+    let name: String
+    let type: String
+    let amount: Double
 }
-*/
 
-/*
- // showing and hiding views - how to use sheet
-struct SecondView: View {
-    @Environment(\.dismiss) var dismiss
+class Expenses: ObservableObject {
+    @Published var items = [ExpenseItem]() {
+        didSet {
+            if let encoded = try? JSONEncoder().encode(items) {
+                UserDefaults.standard.set(encoded, forKey: "Items")
+            }
+        }
+    }
     
-    var body: some View {
-        Button("Dismiss") {
-            dismiss()
+    init() {
+        if let savedItems = UserDefaults.standard.data(forKey: "Items") {
+            if let decodedItems = try? JSONDecoder().decode([ExpenseItem].self, from: savedItems) {
+                items = decodedItems
+                return
+            }
         }
     }
 }
- */
-
-// archiving Swift objects with Codable
-struct User: Codable {
-    let firstName: String
-    let lastName: String
-}
-
 
 struct ContentView: View {
-    //@StateObject var user = User()
-    //@State private var showingSheet = false
-    /*
-    // delete items using onDelete()
-    @State private var numbers = [Int]()
-    @State private var currentNumber = 1
+    @StateObject var expenses = Expenses()
+    @State private var showingAddExpense = false
     
-    func removeRows(at offsets: IndexSet) {
-        numbers.remove(atOffsets: offsets)
+    func removeItems(at offsets: IndexSet) {
+        expenses.items.remove(atOffsets: offsets)
     }
-     */
-    
-    /*
-    // storing user settings with UserDefaults
-    //@State private var tapCount = UserDefaults.standard.integer(forKey: "Tap")
-    @AppStorage("tapCount") private var tapCount = 0
-    */
-    
-    @State private var user = User(firstName: "Taylor", lastName: "Swift")
     
     var body: some View {
-        /*
-        // showing SwiftUI state with @StateObject
-        VStack {
-            Text("Your name is \(user.firstName) \(user.lastName)")
-            
-            TextField("First name", text: $user.firstName)
-            TextField("Last name", text: $user.lastName)
-        }
-         */
-        
-        /*
-        // showing and hiding views - how to use sheet
-        Button("Show Sheet") {
-            showingSheet.toggle()
-        }
-        .sheet(isPresented: $showingSheet) {
-            // contents of the sheet
-            SecondView()
-        }
-         */
-        
-        /*
-         // delete items using onDelete()
         NavigationView {
-            VStack {
-                List {
-                    ForEach(numbers, id: \.self) {
-                        Text("Row \($0)")
+            List {
+                ForEach(expenses.items) { item in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                        }
+                        
+                        Spacer()
+                        Text(item.amount, format: .currency(code: "USD"))
                     }
-                    .onDelete(perform: removeRows)
                 }
-                
-                Button("Add Number") {
-                    numbers.append(currentNumber)
-                    currentNumber += 1
-                }
+                .onDelete(perform: removeItems)
             }
+            .navigationTitle("iExpense")
             .toolbar {
-                EditButton()
+                Button {
+                    showingAddExpense = true
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
-        }
-         */
-        
-        /*
-        // storing user settings with UserDefaults
-        Button("Tap count: \(tapCount)") {
-            tapCount += 1
-            //UserDefaults.standard.set(self.tapCount, forKey: "Tap")
-        }
-         */
-        
-        Button("Save User") {
-            let encoder = JSONEncoder()
-            
-            if let data = try? encoder.encode(user) {
-                UserDefaults.standard.set(data, forKey: "UserData")
+            .sheet(isPresented: $showingAddExpense) {
+                // show an AddView here
+                AddView(expenses: expenses)
             }
         }
     }
