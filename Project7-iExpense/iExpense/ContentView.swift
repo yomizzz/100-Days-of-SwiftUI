@@ -53,7 +53,8 @@ struct ContentView: View {
                         }
                         
                         Spacer()
-                        Text(item.amount, format: .currency(code: "USD"))
+                        Text(item.amount, format: .currency(code: Locale.current.currencyCode ?? "CNY")) // challenge 1
+                            .foregroundColor(item.amount <= 10 ? .blue : item.amount >= 100 ? .red : .green) //challenge 2
                     }
                 }
                 .onDelete(perform: removeItems)
