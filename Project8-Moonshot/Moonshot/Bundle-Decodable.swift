@@ -7,7 +7,9 @@
 
 import Foundation
 
+// https://www.hackingwithswift.com/books/ios-swiftui/using-generics-to-load-any-kind-of-codable-data
 // 使用 generics 让代码更具普适性，针对任意结构的json文件，都可以进行解码
+// 将解码代码，作为 Bundle 的一个扩展，方便调用
 extension Bundle {
     func decode<T: Codable>(_ file: String) -> T {
         guard let url = self.url(forResource: file, withExtension: nil) else {
@@ -29,6 +31,6 @@ extension Bundle {
             fatalError("Failde to decode \(file) from bundle.")
         }
         
-        return loaded
+        return loaded // 以不同格式返回解码后的数据，如列表，字典等等均可
     }
 }

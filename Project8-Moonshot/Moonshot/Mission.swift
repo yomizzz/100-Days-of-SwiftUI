@@ -15,22 +15,21 @@ struct CrewRole: Codable {
  */
 
 struct Mission: Codable, Identifiable {
-    // 调用时使用 Mission.CrewRole，当程序中有很多定制类型时，这样可以更好地组织代码
-    struct CrewRole: Codable {
+    struct CrewRole: Codable { // 调用时使用 Mission.CrewRole，当程序中有很多定制类型时，这样可以更好地组织代码
         let name: String
         let role: String
     }
     
     let id: Int
     let launchDate: Date?
-    let crew: [CrewRole]
+    let crew: [CrewRole] // 当 json 文件内有多个层级，可以用这种形式嵌套
     let description: String
     
-    var displayName: String {
+    var displayName: String { // 计算属性
         "Apollo \(id)"
     }
     
-    var image: String {
+    var image: String { // 计算属性
         "apollo\(id)"
     }
     

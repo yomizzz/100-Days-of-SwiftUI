@@ -9,53 +9,30 @@ import SwiftUI
 
 
 struct ContentView: View {
-    //let astronauts: [String: Astronaut] = Bundle.main.decode("astronauts.json")
+    let astronauts: [String: Astronaut] = Bundle.main.decode("astronauts.json")
     let missions: [Mission] = Bundle.main.decode("missions.json")
     
-    let columns = [
-        GridItem(.adaptive(minimum: 150))
-    ]
+    @State private var showingGrid = false // 用于切换主界面显示样式
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                LazyVGrid(columns: columns) {
-                    ForEach(missions) { mission in
-                        NavigationLink {
-                            Text("Detail View")
-                        } label: {
-                            VStack {
-                                Image(mission.image)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 100, height: 100)
-                                    .padding()
-                                
-                                VStack {
-                                    Text(mission.displayName)
-                                        .font(.headline)
-                                        .foregroundColor(.white)
-                                    Text(mission.formattedLaunchDate)
-                                        .font(.caption)
-                                        .foregroundColor(.white.opacity(0.5))
-                                }
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(.lightBackground)
-                            }
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(.lightBackground)
-                            )
-                        }
-                    }
+            Group { // 不能直接将 modifier 添加给 if 语句，故需要在外面加一个 Group
+                if showingGrid {
+                    MissionGrid(missions: missions, astronauts: astronauts)
+                } else {
+                    MissionList(missions: missions, astronauts: astronauts)
                 }
-                .padding([.horizontal, .bottom])
             }
             .navigationTitle("Moonshot")
             .background(.darkBackground)
             .preferredColorScheme(.dark) // 视图始终为夜间模式，故 Moonshot 字体颜色始终为白色
+            .toolbar { // 在导航栏增加一个按钮，切换主界面显示样式，默认在右上方
+                Button {
+                    showingGrid.toggle()
+                } label: { // 用于显示按钮内容
+                    Text("Change View")
+                }
+            }
         }
     }
 }
