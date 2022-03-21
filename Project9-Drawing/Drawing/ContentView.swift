@@ -7,6 +7,23 @@
 
 import SwiftUI
 
+struct Arrow: Shape { // challenge 1 画箭头
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        path.move(to: CGPoint(x: rect.midX, y: 0))
+        path.addLine(to: CGPoint(x: 0, y: rect.maxY / 4))
+        path.addLine(to: CGPoint(x: rect.maxX / 4, y: rect.maxY / 4))
+        path.addLine(to: CGPoint(x: rect.maxX / 4, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX * 3 / 4, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX * 3 / 4, y: rect.maxY / 4))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY / 4))
+        path.addLine(to: CGPoint(x: rect.midX, y: 0))
+        
+        return path
+    }
+}
+
 // path 和 shape 的区别：path 只能用一次，而 shape 可以复用并接收参数来进行定制
 struct Triangle: Shape {
     func path(in rect: CGRect) -> Path {
@@ -67,6 +84,64 @@ struct Flower: Shape {
     }
 }
 
+struct Trapezoid: Shape { // 画梯形，演示简单图形的动画化，使用 animatableData，只适用于单个数据，且 SwiftUI 不能在整数之间插值
+    var insetAmount: Double
+    
+    var animatableData: Double { // 使 insetAmount 数据可缓慢增加到目标值，同时在这个过程中随之动画化
+        get { insetAmount }
+        set { insetAmount = newValue }
+    }
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        path.move(to: CGPoint(x: 0, y: rect.maxY))
+        path.addLine(to: CGPoint(x: insetAmount, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX - insetAmount, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: 0, y: rect.maxY))
+        
+        return path
+    }
+}
+
+struct Checkerboard: Shape { // 画黑白格， 演示复杂图形的动画化，使用 AnimatablePair 实现，如数据超过2个，需要嵌套
+    var rows: Int
+    var columns: Int
+    
+    var animatableData: AnimatablePair<Double, Double> { // 动画过程中， rows 和 columns 是以1为单位增加的
+        get {
+            AnimatablePair(Double(rows), Double(columns)) // 将 Int 数据转换为 Double 数据，使 SwiftUI 可在数据之间插值并实现动画化
+        }
+        
+        set {
+            rows = Int(newValue.first)
+            columns = Int(newValue.second)
+        }
+    }
+    
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        let rowSize = rect.height / Double(rows)
+        let columnSize = rect.width / Double(columns)
+        
+        for row in 0..<rows {
+            for column in 0..<columns {
+                if (row + column).isMultiple(of: 2) {
+                    
+                    let startX = columnSize * Double(column)
+                    let startY = rowSize * Double(row)
+                    
+                    let rect = CGRect(x: startX, y: startY, width: columnSize, height: rowSize)
+                    path.addRect(rect)
+                }
+            }
+        }
+        
+        return path
+    }
+}
 
 
 struct ContentView: View {
@@ -74,6 +149,13 @@ struct ContentView: View {
     @State private var petalWidth = 100.0
     
     @State private var colorCycle = 0.0
+    
+    @State private var amount = 0.0
+    
+    @State private var insetAmount = 50.0
+    
+    @State private var rows = 4
+    @State private var columns = 4
     
     var body: some View {
         /*
@@ -144,12 +226,112 @@ struct ContentView: View {
             .frame(width: 300, height: 200)
          */
         
-        VStack {
+        /*
+        VStack { // 颜色渐变环，测试 Metal 框架和 Core Animation 框架在性能上的差异
             ColorCyclingCircle(amount: colorCycle)
                 .frame(width: 300, height: 300)
             
             Slider(value: $colorCycle)
         }
+        */
+        
+        /*
+        ZStack { // 测试 blendMode .multiply 是单纯的颜色值相乘
+            Image("PaulHudson")
+            /*
+            Rectangle()
+                .fill(Color(red: 0, green: 1, blue: 0))
+           */
+            
+            Rectangle()
+                .fill(Color(red: 1, green: 0, blue: 0))
+                .blendMode(.multiply)
+        }
+        .frame(width: 400, height: 500)
+        .clipped()
+         */
+        
+        /*
+        Image("PaulHudson")
+            .colorMultiply(.red)
+         */
+        
+        /*
+        VStack {
+            ZStack {
+                Circle()
+                    .fill(Color(red: 1, green: 0, blue: 0))
+                    .frame(width: 200 * amount)
+                    .offset(x: -50, y: -80)
+                    .blendMode(.screen) // 三原色的合成原理
+                
+                Circle()
+                    .fill(Color(red: 0, green: 1, blue: 0))
+                    .frame(width: 200 * amount)
+                    .offset(x: 50, y: -80)
+                    .blendMode(.screen)
+                
+                Circle()
+                    .fill(Color(red: 0, green: 0, blue: 1))
+                    .frame(width: 200 * amount)
+                    .blendMode(.screen)
+            }
+            .frame(width: 300, height: 300)
+         
+         Image("PaulHudson")
+             .resizable()
+             .scaledToFit()
+             .frame(width: 200, height: 200)
+             .saturation(amount) // 饱和度
+             .blur(radius: (1 - amount) * 20) // 不透明度
+            
+            Slider(value: $amount)
+                .padding()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity) // 将以上两个视图合在一起
+        .background(.black)
+        .ignoresSafeArea()
+        */
+        
+        /*
+        Trapezoid(insetAmount: insetAmount)
+            .frame(width: 200, height: 100)
+            .onTapGesture {
+                withAnimation {
+                    insetAmount = Double.random(in: 10...90)
+                }
+            }
+         */
+        
+        /*
+        Checkerboard(rows: rows, columns: columns)
+            .onTapGesture {
+                withAnimation(.linear(duration: 3)) {
+                    rows = 8
+                    columns = 16
+                }
+            }
+         */
+        
+        /*
+        VStack {
+            Arrow()
+                .stroke(.red, style: StrokeStyle(lineWidth: amount * 20, lineCap: .square, lineJoin: .round))
+                .frame(width: 200, height: 400)
+            
+            Slider(value: $amount) // challenge 2 改变箭头线条粗细
+                .padding()
+        }
+        */
+        
+        VStack { // challenge 3 渐变矩形
+            ColorCyclingRectangle(amount: colorCycle)
+                .frame(width: 300, height: 200)
+            
+            Slider(value: $colorCycle)
+        }
+        
+        
     }
 }
 

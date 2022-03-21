@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		ED17641127E893360088D123 /* ColorCyclingRectangle.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED17641027E893360088D123 /* ColorCyclingRectangle.swift */; };
 		EDB114FE27E2156B00900ED9 /* ColorCyclingCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDB114FD27E2156B00900ED9 /* ColorCyclingCircle.swift */; };
 		EDE7174927E0A6E20075F8A0 /* DrawingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDE7174827E0A6E20075F8A0 /* DrawingApp.swift */; };
 		EDE7174B27E0A6E20075F8A0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDE7174A27E0A6E20075F8A0 /* ContentView.swift */; };
@@ -15,6 +16,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		ED17641027E893360088D123 /* ColorCyclingRectangle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCyclingRectangle.swift; sourceTree = "<group>"; };
 		EDB114FD27E2156B00900ED9 /* ColorCyclingCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorCyclingCircle.swift; sourceTree = "<group>"; };
 		EDE7174527E0A6E20075F8A0 /* Drawing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Drawing.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EDE7174827E0A6E20075F8A0 /* DrawingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DrawingApp.swift; sourceTree = "<group>"; };
@@ -56,6 +58,7 @@
 				EDE7174827E0A6E20075F8A0 /* DrawingApp.swift */,
 				EDE7174A27E0A6E20075F8A0 /* ContentView.swift */,
 				EDB114FD27E2156B00900ED9 /* ColorCyclingCircle.swift */,
+				ED17641027E893360088D123 /* ColorCyclingRectangle.swift */,
 				EDE7174C27E0A6E60075F8A0 /* Assets.xcassets */,
 				EDE7174E27E0A6E60075F8A0 /* Preview Content */,
 			);
@@ -143,6 +146,7 @@
 				EDE7174B27E0A6E20075F8A0 /* ContentView.swift in Sources */,
 				EDB114FE27E2156B00900ED9 /* ColorCyclingCircle.swift in Sources */,
 				EDE7174927E0A6E20075F8A0 /* DrawingApp.swift in Sources */,
+				ED17641127E893360088D123 /* ColorCyclingRectangle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
