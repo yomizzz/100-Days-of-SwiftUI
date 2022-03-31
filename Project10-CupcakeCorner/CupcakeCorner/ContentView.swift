@@ -7,89 +7,46 @@
 
 import SwiftUI
 
-struct Response: Codable {
-    var results: [Result]
-}
-
-struct Result: Codable {
-    var trackId: Int
-    var trackName: String
-    var collectionName: String
-}
 
 struct ContentView: View {
-    @State private var results = [Result]()
-    
-    func loadData() async {
-        guard let url = URL(string: "https://itunes.apple.com/search?term=jay+chou&entity=song") else {
-            print("Invalid URL")
-            return
-        }
-        
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            
-            if let decodedResponse = try? JSONDecoder().decode(Response.self, from: data) {
-                results = decodedResponse.results
-            }
-        } catch {
-            print("Invalid data")
-        }
-    }
-    
-    @State private var username = ""
-    @State private var email = ""
-    
-    var disableForm: Bool {
-        username.count < 5 || email.count < 5
-    }
+    @StateObject var order = Order()
     
     var body: some View {
-        /*
-        // 以列表的形式显示远程下载的歌曲名和专辑名
-        List(results, id: \.trackId) { item in
-            VStack(alignment: .leading) {
-                Text(item.trackName)
-                    .font(.headline)
-                
-                Text(item.collectionName)
-            }
-        }
-        .task {
-            await loadData()
-        }
-         */
-        
-        /*
-        // 远程下载图片并按照设定要求显示在视图中
-        AsyncImage(url: URL(string: "https://hws.dev/img/logo.png")) { phase in
-            if let image = phase.image {
-                image
-                    .resizable()
-                    .scaledToFit()
-            } else if phase.error != nil {
-                Text("There was an error loading the image.")
-            } else {
-                ProgressView()
-            }
-        }
-        .frame(width: 200, height: 200)
-         */
-        
-        Form {
-            Section {
-                TextField("Username", text: $username)
-                TextField("Email", text: $email)
-            }
-            
-            Section {
-                Button("Create account") {
-                    print("Creating account...")
+        NavigationView {
+            Form {
+                Section { // 选择蛋糕种类和数量
+                    Picker("Select your cake type", selection: $order.type) {
+                        ForEach(Order.types.indices) { // 使用列表元素对应下标来选择元素并显示
+                            Text(Order.types[$0])
+                        }
+                    }
+                    
+                    Stepper("Number of cakes: \(order.quantity)", value: $order.quantity, in: 3...20) // 选择蛋糕数量
                 }
+                
+                Section { // 选择额外添加的配料
+                    Toggle("Any sepcial requests?", isOn: $order.specialRequestEnabled.animation())
+                    
+                    if order.specialRequestEnabled { // 只有当需要添加额外配料的开关打开（true）后，才能选择配料
+                        Toggle("Add extra frosting", isOn: $order.extraFrosting)
+                        
+                        Toggle("Add extra sprinkle", isOn: $order.addSprinkles)
+                    }
+                }
+                
+                Section { // 完成选择后进入外卖递送信息页面
+                    NavigationLink {
+                        AddressView(order: order) // 外卖递送信息页面
+                    } label: {
+                        Text("Delivery details")
+                    }
+                }
+                
             }
-            //.disabled(username.isEmpty || email.isEmpty)
-            .disabled(disableForm)
+            .navigationTitle("Cupcake Corner")
+            
         }
+        
     }
 }
 
