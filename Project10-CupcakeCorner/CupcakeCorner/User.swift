@@ -16,7 +16,7 @@ class User: ObservableObject, Codable {
     @Published var name = "Paul Hudson"
     
     required init(from decoder: Decoder) throws { // 将储存的属性数据解码，用于读取
-        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let container = try decoder.container(keyedBy: CodingKeys.self) // 可能
         name = try container.decode(String.self, forKey: .name)
     }
     
