@@ -15,22 +15,22 @@ struct ContentView: View {
         NavigationView {
             Form {
                 Section { // 选择蛋糕种类和数量
-                    Picker("Select your cake type", selection: $order.type) {
-                        ForEach(Order.types.indices) { // 使用列表元素对应下标来选择元素并显示
-                            Text(Order.types[$0])
+                    Picker("Select your cake type", selection: $order.orderitem.type) {
+                        ForEach(OrderItem.types.indices) { // 使用列表元素对应下标来选择元素并显示
+                            Text(OrderItem.types[$0])
                         }
                     }
                     
-                    Stepper("Number of cakes: \(order.quantity)", value: $order.quantity, in: 3...20) // 选择蛋糕数量
+                    Stepper("Number of cakes: \(order.orderitem.quantity)", value: $order.orderitem.quantity, in: 3...20) // 选择蛋糕数量
                 }
                 
                 Section { // 选择额外添加的配料
-                    Toggle("Any sepcial requests?", isOn: $order.specialRequestEnabled.animation())
+                    Toggle("Any sepcial requests?", isOn: $order.orderitem.specialRequestEnabled.animation())
                     
-                    if order.specialRequestEnabled { // 只有当需要添加额外配料的开关打开（true）后，才能选择配料
-                        Toggle("Add extra frosting", isOn: $order.extraFrosting)
+                    if order.orderitem.specialRequestEnabled { // 只有当需要添加额外配料的开关打开（true）后，才能选择配料
+                        Toggle("Add extra frosting", isOn: $order.orderitem.extraFrosting)
                         
-                        Toggle("Add extra sprinkle", isOn: $order.addSprinkles)
+                        Toggle("Add extra sprinkle", isOn: $order.orderitem.addSprinkles)
                     }
                 }
                 

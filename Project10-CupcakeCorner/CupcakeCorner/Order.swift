@@ -5,10 +5,33 @@
 //  Created by yomizzz on 2022/3/31.
 //
 
-import SwiftUI
+import Foundation
 
 // 需要手动使得 Order 类遵从 Codable 协议，让 Swift 知道哪些参数需要编码，怎样编码以及怎样解码
-class Order: ObservableObject, Codable {
+// challenge 3 convert data model from a class to a struct
+class Order: ObservableObject {
+    @Published var orderitem: OrderItem
+    
+    enum CodingKeys: CodingKey {
+        case orderitem
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(orderitem, forKey: .orderitem)
+    }
+    
+    required init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        orderitem = try container.decode(OrderItem.self, forKey: .orderitem)
+    }
+    
+    init() {
+        orderitem = OrderItem() // 如何表示包含默认参数的数据类型
+    }
+    
+    
+    /*
     static let types = ["Vanilla", "Strawberry", "Chocolate", "Rainbow"] // 用 Array 存储蛋糕种类
     
     @Published var type = 0
@@ -31,7 +54,8 @@ class Order: ObservableObject, Codable {
     @Published var zip = ""
     
     var hasValidAddress: Bool { // 判断递送信息是否完整填写，如有其中一个未填写，则 Check out 选项处于灰色状态，无法点击进入下一页面
-        if name.isEmpty || streetAddress.isEmpty || city.isEmpty || zip.isEmpty {
+        // challenge 1 识别输入文本中有空格，算输入无效
+        if name.trimmingCharacters(in: .whitespaces).isEmpty || streetAddress.trimmingCharacters(in: .whitespaces).isEmpty || city.trimmingCharacters(in: .whitespaces).isEmpty || zip.trimmingCharacters(in: .whitespaces).isEmpty {
             return false
         }
         
@@ -89,5 +113,5 @@ class Order: ObservableObject, Codable {
     }
     
     init() { }
-    
+    */
 }

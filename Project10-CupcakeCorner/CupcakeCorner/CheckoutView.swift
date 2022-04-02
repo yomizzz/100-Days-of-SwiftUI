@@ -13,9 +13,14 @@ struct CheckoutView: View {
     @State private var confirmationMessage = ""
     @State private var showingConfirmation = false
     
+    @State private var errorMessage = ""
+    @State private var showingError = false
+    
     func placeOrder() async {
-        guard let encoded = try? JSONEncoder().encode(order) else { // 将 order 数据编码
+        guard let encoded = try? JSONEncoder().encode(order.orderitem) else { // 将 order 数据编码
             print("Failed to encode order")
+            errorMessage = "Failed to encode order."
+            showingError = true
             return
         }
         
@@ -27,11 +32,12 @@ struct CheckoutView: View {
         
         do { // 发送数据并返回信息
             let (data, _) = try await URLSession.shared.upload(for: request, from: encoded)
-            let decodedOrder = try JSONDecoder().decode(Order.self, from: data)
-            confirmationMessage = "Your order for \(decodedOrder.quantity)x \(Order.types[decodedOrder.type].lowercased()) cupcakes is on its way"
+            let decodedOrder = try JSONDecoder().decode(OrderItem.self, from: data)
+            confirmationMessage = "Your order for \(decodedOrder.quantity)x \(OrderItem.types[decodedOrder.type].lowercased()) cupcakes is on its way"
             showingConfirmation = true
-        } catch {
-            print("Checkout failed.")
+        } catch { // challenge 2 当数据发送或反馈异常时，显示 alert 提示
+            errorMessage = "Checkout failed."
+            showingError = true
         }
         
     }
@@ -49,7 +55,7 @@ struct CheckoutView: View {
                 }
                 .frame(height: 233)
                 
-                Text("Your total is \(order.cost, format: .currency(code: "CNY"))")
+                Text("Your total is \(order.orderitem.cost, format: .currency(code: "CNY"))")
                     .font(.title)
                 
                 Button("Place Order") { // 此处还需补充一个函数，用于将我们的预定信息转换为 JSON 文件，发送出去并得到响应
@@ -66,6 +72,11 @@ struct CheckoutView: View {
             Button("OK") { }
         } message: {
             Text(confirmationMessage)
+        }
+        .alert("Sorry!", isPresented: $showingError) {
+            Button("OK") { }
+        } message: {
+            Text(errorMessage)
         }
     }
 }

@@ -13,10 +13,10 @@ struct AddressView: View {
     var body: some View {
         Form {
             Section {
-                TextField("Name", text: $order.name)
-                TextField("Street Address", text: $order.streetAddress)
-                TextField("City", text: $order.city)
-                TextField("Zip", text: $order.zip)
+                TextField("Name", text: $order.orderitem.name)
+                TextField("Street Address", text: $order.orderitem.streetAddress)
+                TextField("City", text: $order.orderitem.city)
+                TextField("Zip", text: $order.orderitem.zip)
             }
             
             Section {
@@ -26,7 +26,7 @@ struct AddressView: View {
                     Text("Check out")
                 }
             }
-            .disabled(order.hasValidAddress == false) // 只有当外卖递送信息填写完整，才能点击 Check out 选项
+            .disabled(order.orderitem.hasValidAddress == false) // 只有当外卖递送信息填写完整，才能点击 Check out 选项
         }
         .navigationTitle("Delivery details")
         .navigationBarTitleDisplayMode(.inline)
