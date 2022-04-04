@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PushButton: View {
+struct PushButton: View { // 与本项目无关，练习使用
     let title: String
     @Binding var isOn: Bool // 使该值的改变能够传递到 ContentView 里
     
