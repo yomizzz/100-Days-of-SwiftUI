@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import CoreData
+//import CoreData
 
 struct DetailView: View {
     @Environment(\.managedObjectContext) var moc
@@ -20,6 +20,12 @@ struct DetailView: View {
         
         // try? moc.save()
         dismiss()
+    }
+    
+    func dateFormatter(_ date: Date) -> String { // challenge 3 将日期格式化为字符串
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: date)
     }
     
     var body: some View {
@@ -48,6 +54,13 @@ struct DetailView: View {
             
             RatingView(rating: .constant(Int(book.rating)))
                 .font(.largeTitle)
+            
+            Text("Created at: \(self.dateFormatter(book.date ?? Date()))") // challenge 3 详情页添加创建书籍条目时间
+                .font(.callout)
+                .foregroundColor(.secondary)
+                .padding()
+            
+            Spacer()
         }
         .navigationTitle(book.title ?? "Unknown Book")
         .navigationBarTitleDisplayMode(.inline)
@@ -67,6 +80,7 @@ struct DetailView: View {
     }
 }
 
+/*
 struct DetailView_Previews: PreviewProvider {
     static let moc = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
     
@@ -83,3 +97,4 @@ struct DetailView_Previews: PreviewProvider {
         }
     }
 }
+*/

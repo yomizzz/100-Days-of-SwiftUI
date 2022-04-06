@@ -16,8 +16,17 @@ struct AddBookView: View {
     @State private var rating = 3
     @State private var genre = ""
     @State private var review = ""
+    @State private var date = Date.now //challenge 3 增加添加书籍条目时间
     
     let genres = ["经济理财", "个人成长", "小说", "文学", "历史", "心理", "哲学宗教", "人物传记", "社会文化", "生活百科", "教育学习", "医学健康", "计算机", "科学科技", "政治军事", "艺术", "童书", "期刊专栏", "原版书"] // 参考微信读书书籍分类
+    
+    var hasValidBook: Bool {
+        if title.trimmingCharacters(in: .whitespaces).isEmpty || author.trimmingCharacters(in: .whitespaces).isEmpty || genre.isEmpty {
+            return false
+        }
+        
+        return true
+    }
     
     var body: some View {
         NavigationView {
@@ -56,6 +65,7 @@ struct AddBookView: View {
                         dismiss() // 完成后自动关闭添加书籍页面
                     }
                 }
+                .disabled(hasValidBook == false) // challenge 1 书籍添加页面书籍名字，作者名和类别都填写后，才能点击保存按钮
             }
             .navigationTitle("Add Book")
         }

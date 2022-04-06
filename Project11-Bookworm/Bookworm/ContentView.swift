@@ -39,6 +39,8 @@ struct ContentView: View {
                         VStack(alignment: .leading) {
                             Text(book.title ?? "Unknown Title")
                                 .font(.headline)
+                                .foregroundColor( book.rating <= 1 ? .red : .black) // challenge 2 当书籍评分小于1分时，书籍名称显示为红色
+                            
                             Text(book.author ?? "Unknown Author")
                                 .foregroundColor(.secondary)
                         }
